@@ -159,7 +159,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 cursor.execute("SELECT TOP 1 SENSOR_RECORD_CREATED FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_STATUS='MOTION_OFF'ORDER BY SENSOR_RECORD_CREATED DESC")
                 latestOff = cursor.fetchone()[0]
 
-                timeDelta = latestOff - latestOn
+                timeDelta = abs(latestOff - latestOn)
                 timeDelta = divmod(timeDelta.days * 86400 + timeDelta.seconds, 60)
                 minutes = timeDelta[0]
                 seconds = timeDelta[1]
@@ -200,24 +200,34 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 cursor.execute("SELECT TOP 1 SENSOR_STATUS,SENSOR_RECORD_CREATED FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART' ORDER BY SENSOR_RECORD_CREATED DESC")
                 heartData = cursor.fetchone()
                 latestHeartRate = int(heartData[0])
-                print(latestHeartRate)
+                print("latestHeartRate",latestHeartRate)
+            except Exception as e:
+                print("1",e)
 
+            try:
                 cursor.execute("SELECT AVG(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART'") #TODO: and date= today's date
                 averageHeartRate = cursor.fetchone()[0]
-                averageHeartRate = float(averageHeartRate)
+                averageHeartRate = round(float(averageHeartRate))
+                print("averageHeartRate",averageHeartRate)
+            except Exception as e:
+                print("2",e)
 
+            try:
                 cursor.execute("SELECT MAX(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART'") #TODO: and date = today's date
                 max_HeartRate = cursor.fetchone()[0]
                 if max_HeartRate > 140:
                     max_HeartRate = 139
 
-                cursor.execute("SELECT MIN(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART' AND TO_INT(SENSOR_STATUS)>(SELECT MIN(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA)") #TODO: and date = today's date
+                cursor.execute("SELECT MIN(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART'") #TODO: and date = today's date
                 min_HeartRate = cursor.fetchone()[0]
-
-                self.write_message(json.dumps({"messageLabel":"Pulse","latestHeartRate":latestHeartRate,"averageHeartRate":averageHeartRate,"max_heart_rate":max_HeartRate,"min_HeartRate":min_HeartRate}))
+                print("min_HeartRate",min_HeartRate)
             except Exception as e:
-                print("In except Handler Pulse",e)
-                self.write_message(json.dumps({"messageLabel":"Pulse","latestHeartRate":"N/A","averageHeartRate":"N/A","max_heart_rate":"N/A","min_heart_rate":"N/A"}))
+                print("3",e)
+
+            self.write_message(json.dumps({"messageLabel":"Pulse","latestHeartRate":latestHeartRate,"averageHeartRate":averageHeartRate,"max_heart_rate":max_HeartRate,"min_heart_rate":min_HeartRate}))
+            # except Exception as e:
+            #     print("In except Handler Pulse",e)
+            #     self.write_message(json.dumps({"messageLabel":"Pulse","latestHeartRate":"N/A","averageHeartRate":"N/A","max_heart_rate":"N/A","min_heart_rate":"N/A"}))
 
         elif messageLabel == "heartGraphData":
             # {"heartValue":"72","timestamp":"timestampFromServer"}

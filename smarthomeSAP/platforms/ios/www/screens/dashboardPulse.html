@@ -16,7 +16,7 @@
     <div class="col s12 m6 marginBottomCol">
         <div class="card">
             <div class="card-content row">
-                <p class="card-title col s8">Current Pulse</p><span class="card-title col s4" style="color:green" id="latest_heart_rate">72 BPM</span>
+                <p class="card-title col s8">Current Pulse</p><span class="card-title col s4" style="color:green" id="latest_heart_rate">NA</span>
             </div>
         </div>
     </div>
@@ -26,7 +26,7 @@
     <div class="col s12 m6 marginBottomCol">
         <div class="card">
             <div class="card-content row">
-                <p class="card-title col s8">Max Pulse</p><span class="card-title col s4" style="color:green" id="max_heart_rate">90 BPM</span>
+                <p class="card-title col s8">Max Pulse</p><span class="card-title col s4" style="color:green" id="max_heart_rate">NA</span>
             </div>
         </div>
     </div>
@@ -36,7 +36,7 @@
     <div class="col s12 m6 marginBottomCol">
         <div class="card">
             <div class="card-content row">
-                <p class="card-title col s8">Min Pulse</p><span class="card-title col s4" style="color:green" id="min_heart_rate">59 BPM</span>
+                <p class="card-title col s8">Min Pulse</p><span class="card-title col s4" style="color:green" id="min_heart_rate">NA</span>
             </div>
         </div>
     </div>
@@ -46,7 +46,7 @@
     <div class="col s12 m6 marginBottomCol">
         <div class="card">
             <div class="card-content row">
-                <p class="card-title col s8">Average Pulse</p><span class="card-title col s4" style="color:green" id="avg_heart_rate">71 BPM</span>
+                <p class="card-title col s8">Average Pulse</p><span class="card-title col s4" style="color:green" id="avg_heart_rate">NA</span>
             </div>
         </div>
     </div>
@@ -92,6 +92,10 @@
 
     // WEBSOCKETS CODE
 
+    var smoothie = new SmoothieChart();
+    smoothie.streamTo(document.getElementById("visualisation_day"), 1000);
+    var line1 = new TimeSeries();
+
 
 
     wsPulse.onopen = function() {
@@ -115,10 +119,14 @@
        var max_heart_rate = messageFromServer.max_heart_rate;
        var min_heart_rate = messageFromServer.min_heart_rate;
 
-       $('#latest_heart_rate').html(latest_heart_rate);
-       $('#avg_heart_rate').html(avg_heart_rate);
-       $('#max_heart_rate').html(max_heart_rate);
-       $('#min_heart_rate').html(min_heart_rate);
+       $('#latest_heart_rate').html(latest_heart_rate+" BPM");
+       $('#avg_heart_rate').html(avg_heart_rate+" BPM");
+       $('#max_heart_rate').html(max_heart_rate+" BPM");
+       $('#min_heart_rate').html(min_heart_rate+" BPM");
+       setInterval(function() {
+     line1.append(new Date().getTime(), Math.random(latest_heart_rate,max_heart_rate));
+   }, 1000);
+       smoothie.addTimeSeries(line1);
 
     }
   }
@@ -140,13 +148,7 @@ $('#tab_active_dashboardPulse').click(function(){
   clearInterval(pulseInterval);
 });
 
-    var smoothie = new SmoothieChart();
-    smoothie.streamTo(document.getElementById("visualisation_day"), 1000);
-    var line1 = new TimeSeries();
-    setInterval(function() {
-  line1.append(new Date().getTime(), Math.random(75,96));
-}, 1000);
-    smoothie.addTimeSeries(line1);
+
 
 
 
