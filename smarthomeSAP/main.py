@@ -26,8 +26,8 @@ auth_token  = "5ee6ef76aeae2121ee06a3d6a90a330e"  # Your Auth Token from www.twi
 client = TwilioRestClient(account_sid, auth_token)
 
 # defined constants
-count = 560000001
-heartCount = 570000001
+count = 1560000001
+heartCount = 1570000001
 caregiver_count = 201
 lightCount = 1
 previousTime = datetime.datetime.now()
