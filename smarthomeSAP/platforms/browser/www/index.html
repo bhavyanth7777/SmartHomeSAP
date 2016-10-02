@@ -33,9 +33,15 @@
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="css/materialize.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/path.js/0.8.4/path.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
     <!-- Compiled and minified JavaScript -->
     <script src="js/materialize.min.js"></script>
+    <script>
+    wsActive = new WebSocket("ws://localhost:8000/ws");
+    wsPulse = new WebSocket("ws://localhost:8000/ws");
+    wsSleep = new WebSocket("ws://localhost:8000/ws");
+    </script>
     <title>SmartHome SAP</title>
     <style media="screen">
       .marginBottom0{
@@ -105,6 +111,8 @@
     <script type="text/javascript" src="js/routes.js"></script>
     <script type="text/javascript" src="cordova.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="js/smoothie.js"></script>
+
     <script type="text/javascript">
         app.initialize();
     </script>

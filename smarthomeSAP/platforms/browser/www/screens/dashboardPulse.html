@@ -1,18 +1,22 @@
 <div class="row">
     <div class="col s12">
         <ul class="tabs">
-            <li class="tab col s3"><a href="#/dashboard" style="color:#FFC107">Active</a></li>
-            <li class="tab col s3"><a href="#/dashboardSleep" style="color:#FFC107">Sleep</a></li>
-            <li class="tab col s3"><a href="" class="active" style="color:#FFC107">Pulse</a></li>
+            <li class="tab col s3"><a href="#/dashboard" style="color:#FFC107" id="tab_active_dashboardPulse">Active</a></li>
+            <li class="tab col s3"><a href="#/dashboardSleep" style="color:#FFC107" id="tab_sleep_dashboardPulse">Sleep</a></li>
+            <li class="tab col s3"><a href="" class="active" style="color:#FFC107" id="tab_pulse_dashboardPulse">Pulse</a></li>
         </ul>
     </div>
 </div>
+<canvas id="visualisation_day" class="col s12" style="display:none;" width="410" height="200"></canvas>
+<svg id="visualisation_week" style="display:none;" width="400" height="200"></svg>
+<svg id="visualisation_month" style="display:none;" width="400" height="200"></svg>
 
+<div id="pulseTab">
 <div class="row marginBottom0">
     <div class="col s12 m6 marginBottomCol">
         <div class="card">
             <div class="card-content row">
-                <p class="card-title col s8">Current Pulse</p><span class="card-title col s4" style="color:green">72 BPM</span>
+                <p class="card-title col s8">Current Pulse</p><span class="card-title col s4" style="color:green" id="latest_heart_rate">72 BPM</span>
             </div>
         </div>
     </div>
@@ -22,7 +26,7 @@
     <div class="col s12 m6 marginBottomCol">
         <div class="card">
             <div class="card-content row">
-                <p class="card-title col s8">Max Pulse</p><span class="card-title col s4" style="color:green">90 BPM</span>
+                <p class="card-title col s8">Max Pulse</p><span class="card-title col s4" style="color:green" id="max_heart_rate">90 BPM</span>
             </div>
         </div>
     </div>
@@ -32,7 +36,7 @@
     <div class="col s12 m6 marginBottomCol">
         <div class="card">
             <div class="card-content row">
-                <p class="card-title col s8">Min Pulse</p><span class="card-title col s4" style="color:green">59 BPM</span>
+                <p class="card-title col s8">Min Pulse</p><span class="card-title col s4" style="color:green" id="min_heart_rate">59 BPM</span>
             </div>
         </div>
     </div>
@@ -42,20 +46,20 @@
     <div class="col s12 m6 marginBottomCol">
         <div class="card">
             <div class="card-content row">
-                <p class="card-title col s8">Average Pulse</p><span class="card-title col s4" style="color:green">71 BPM</span>
+                <p class="card-title col s8">Average Pulse</p><span class="card-title col s4" style="color:green" id="avg_heart_rate">71 BPM</span>
             </div>
         </div>
     </div>
 </div>
+</div>
 
-
-<div class="fixed-action-btn horizontal click-to-toggle activeTab" style="bottom: 45px; right: 24px;">
-    <a class="btn-floating btn-large" style="background-color:#FFC107">
+<div class="fixed-action-btn horizontal" style="bottom: 45px; right: 24px;">
+    <a class="btn-floating btn-large" style="background-color:#FFC107" id="pulse_chart">
       <i class="material-icons">insert_chart</i>
     </a>
     <ul>
-      <li><a class="btn-floating red"><i class="material-icons">date_range</i></a></li>
-      <li><a class="btn-floating red"><i class="material-icons">view_week</i></a></li>
+      <li><a class="btn-floating red" id="pulse_monthly"><i class="material-icons">date_range</i></a></li>
+      <li><a class="btn-floating red" id="pulse_weekly"><i class="material-icons">view_week</i></a></li>
     </ul>
   </div>
 
@@ -64,4 +68,422 @@
         $('ul.tabs').tabs();
     });
 
+    $('#pulse_chart').click(function(){
+      $('#pulseTab').css("display","block");
+      $('#visualisation_day').css("display","none");
+      $('#visualisation_week').css("display","none");
+      $('#visualisation_month').css("display","none");
+    });
+
+    $('#pulse_weekly').click(function(){
+      $('#pulseTab').css("display","none");
+      $('#visualisation_day').css("display","block");
+      $('#visualisation_week').css("display","block");
+      $('#visualisation_month').css("display","block");
+
+    });
+
+    $('#pulse_monthly').click(function(){
+      $('#pulseTab').css("display","none");
+      $('#visualisation_day').css("display","block");
+      $('#visualisation_week').css("display","block");
+      $('#visualisation_month').css("display","block");
+    });
+
+    // WEBSOCKETS CODE
+
+
+
+    wsPulse.onopen = function() {
+        alert("Connection open");
+    }
+
+
+
+    wsPulse.onclose = function() {
+    alert("Connection Closed");
+    }
+
+    wsPulse.onmessage = function(messageFromServer) {
+    messageFromServer = JSON.parse(messageFromServer.data);
+    messageLabel = messageFromServer.messageLabel;
+
+    if (messageLabel === "Pulse") {
+      console.log("Pulse");
+       var latest_heart_rate = messageFromServer.latestHeartRate;
+       var avg_heart_rate = messageFromServer.averageHeartRate;
+       var max_heart_rate = messageFromServer.max_heart_rate;
+       var min_heart_rate = messageFromServer.min_heart_rate;
+
+       $('#latest_heart_rate').html(latest_heart_rate);
+       $('#avg_heart_rate').html(avg_heart_rate);
+       $('#max_heart_rate').html(max_heart_rate);
+       $('#min_heart_rate').html(min_heart_rate);
+
+    }
+  }
+
+
+
+var pulseInterval = setInterval(function() {
+  console.log("sending pulse");
+    wsPulse.send(JSON.stringify({
+        messageLabel: "Pulse"
+    }));
+}, 1000);
+
+$('#tab_sleep_dashboardPulse').click(function(){
+  clearInterval(pulseInterval);
+});
+
+$('#tab_active_dashboardPulse').click(function(){
+  clearInterval(pulseInterval);
+});
+
+    var smoothie = new SmoothieChart();
+    smoothie.streamTo(document.getElementById("visualisation_day"), 1000);
+    var line1 = new TimeSeries();
+    setInterval(function() {
+  line1.append(new Date().getTime(), Math.random(75,96));
+}, 1000);
+    smoothie.addTimeSeries(line1);
+
+
+
+
+    // WEEKLY DATA
+    var weekly_active_data = [{
+        "min_heart_rate":"52",
+        "max_heart_rate":"92",
+        "avg_heart_rate":"78",
+        "day":"1"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"96",
+      "avg_heart_rate":"80",
+        "day":"2"
+    },{
+      "min_heart_rate":"65",
+      "max_heart_rate":"100",
+      "avg_heart_rate":"80",
+        "day":"3"
+    },{
+      "min_heart_rate":"66",
+      "max_heart_rate":"100",
+      "avg_heart_rate":"78",
+        "day":"4"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"89",
+      "avg_heart_rate":"75",
+        "day":"5"
+    },{
+      "min_heart_rate":"63",
+      "max_heart_rate":"92",
+      "avg_heart_rate":"78",
+        "day":"6"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"84",
+      "avg_heart_rate":"73",
+        "day":"7"
+    },];
+
+    var monthly_active_data = [{
+        "min_heart_rate":"52",
+        "max_heart_rate":"92",
+        "avg_heart_rate":"78",
+        "day":"1"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"96",
+      "avg_heart_rate":"80",
+        "day":"2"
+    },{
+      "min_heart_rate":"65",
+      "max_heart_rate":"100",
+      "avg_heart_rate":"80",
+        "day":"3"
+    },{
+      "min_heart_rate":"66",
+      "max_heart_rate":"100",
+      "avg_heart_rate":"78",
+        "day":"4"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"89",
+      "avg_heart_rate":"75",
+        "day":"5"
+    },{
+      "min_heart_rate":"63",
+      "max_heart_rate":"92",
+      "avg_heart_rate":"78",
+        "day":"6"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"84",
+      "avg_heart_rate":"73",
+        "day":"7"
+    },{
+      "min_heart_rate":"70",
+      "max_heart_rate":"99",
+      "avg_heart_rate":"74",
+        "day":"8"
+    },{
+      "min_heart_rate":"65",
+      "max_heart_rate":"100",
+      "avg_heart_rate":"80",
+        "day":"9"
+    },{
+      "min_heart_rate":"66",
+      "max_heart_rate":"100",
+      "avg_heart_rate":"78",
+        "day":"10"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"89",
+      "avg_heart_rate":"75",
+        "day":"11"
+    },{
+      "min_heart_rate":"63",
+      "max_heart_rate":"92",
+      "avg_heart_rate":"78",
+        "day":"12"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"84",
+      "avg_heart_rate":"73",
+        "day":"13"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"96",
+      "avg_heart_rate":"80",
+        "day":"14"
+    },{
+      "min_heart_rate":"65",
+      "max_heart_rate":"100",
+      "avg_heart_rate":"80",
+        "day":"15"
+    },{
+      "min_heart_rate":"66",
+      "max_heart_rate":"100",
+      "avg_heart_rate":"78",
+        "day":"16"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"89",
+      "avg_heart_rate":"75",
+        "day":"17"
+    },{
+      "min_heart_rate":"63",
+      "max_heart_rate":"92",
+      "avg_heart_rate":"78",
+        "day":"18"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"84",
+      "avg_heart_rate":"73",
+        "day":"19"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"96",
+      "avg_heart_rate":"80",
+        "day":"20"
+    },{
+      "min_heart_rate":"65",
+      "max_heart_rate":"100",
+      "avg_heart_rate":"80",
+        "day":"21"
+    },{
+      "min_heart_rate":"66",
+      "max_heart_rate":"100",
+      "avg_heart_rate":"78",
+        "day":"22"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"89",
+      "avg_heart_rate":"75",
+        "day":"23"
+    },{
+      "min_heart_rate":"63",
+      "max_heart_rate":"92",
+      "avg_heart_rate":"78",
+        "day":"24"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"84",
+      "avg_heart_rate":"73",
+        "day":"25"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"84",
+      "avg_heart_rate":"73",
+        "day":"26"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"84",
+      "avg_heart_rate":"73",
+        "day":"27"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"84",
+      "avg_heart_rate":"73",
+        "day":"28"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"84",
+      "avg_heart_rate":"73",
+        "day":"29"
+    },{
+      "min_heart_rate":"60",
+      "max_heart_rate":"84",
+      "avg_heart_rate":"73",
+        "day":"30"
+    },];
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// DEFINE GRAPH DIMENSIONS
+  var vis_week = d3.select("#visualisation_week"),
+      WIDTH = 400,
+      HEIGHT = 200,
+      MARGINS = {
+          top: 20,
+          right: 20,
+          bottom: 20,
+          left: 50
+      },
+  // DEFINE X SCALE AND Y SCALE DYNAMICALLY
+      week_xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([0,7]),
+      week_yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([30,140]),
+  // DEFINE X AXIS AND Y AXIS
+      week_xAxis = d3.svg.axis()
+      .scale(week_xScale),
+
+      week_yAxis = d3.svg.axis()
+      .scale(week_yScale)
+      .orient("left");
+
+  // REFLECT X AXIS
+  vis_week.append("svg:g")
+      .attr("class","axis")
+      .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+      .call(week_xAxis);
+
+  // REFLECT Y AXIS
+  vis_week.append("svg:g")
+  .attr("class","axis")
+  .attr("transform", "translate(" + (MARGINS.left) + ",0)")
+  .call(week_yAxis);
+
+  // DEFINE THE LINE
+  var week_lineGen = d3.svg.line()
+.x(function(d) {
+  return week_xScale(d.day);
+})
+.y(function(d) {
+  return week_yScale(d.avg_heart_rate);
+})
+.interpolate("basis"); // to smooth out the lines
+
+var week_lineGen_Max = d3.svg.line()
+.x(function(d) {
+return week_xScale(d.day);
+})
+.y(function(d) {
+return week_yScale(d.max_heart_rate);
+})
+.interpolate("basis"); // to smooth out the lines
+
+// ADD THE LINE TO SVG
+vis_week.append('svg:path')
+.attr('d', week_lineGen(weekly_active_data)) //mapping d to data
+.attr('stroke', 'green')
+.attr('stroke-width', 2)
+.attr('fill', 'none');
+
+vis_week.append('svg:path')
+.attr('d', week_lineGen_Max(weekly_active_data)) //mapping d to data
+.attr('stroke', 'blue')
+.attr('stroke-width', 2)
+.attr('fill', 'none');
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var vis_month = d3.select("#visualisation_month"),
+    WIDTH = 400,
+    HEIGHT = 200,
+    MARGINS = {
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 50
+    },
+// DEFINE X SCALE AND Y SCALE DYNAMICALLY
+    month_xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([0,30]),
+    month_yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([30,140]),
+// DEFINE X AXIS AND Y AXIS
+    month_xAxis = d3.svg.axis()
+    .scale(month_xScale),
+
+    month_yAxis = d3.svg.axis()
+    .scale(month_yScale)
+    .orient("left");
+
+// REFLECT X AXIS
+vis_month.append("svg:g")
+    .attr("class","axis")
+    .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+    .call(month_xAxis);
+
+// REFLECT Y AXIS
+vis_month.append("svg:g")
+.attr("class","axis")
+.attr("transform", "translate(" + (MARGINS.left) + ",0)")
+.call(month_yAxis);
+
+// DEFINE THE LINE
+var month_lineGen = d3.svg.line()
+.x(function(d) {
+return month_xScale(d.day);
+})
+.y(function(d) {
+return month_yScale(d.avg_heart_rate);
+})
+.interpolate("basis"); // to smooth out the lines
+
+var month_lineGen_Max = d3.svg.line()
+.x(function(d) {
+return month_xScale(d.day);
+})
+.y(function(d) {
+return month_yScale(d.max_heart_rate);
+})
+.interpolate("basis"); // to smooth out the lines
+
+// ADD THE LINE TO SVG
+vis_month.append('svg:path')
+.attr('d', month_lineGen(monthly_active_data)) //mapping d to data
+.attr('stroke', 'green')
+.attr('stroke-width', 2)
+.attr('fill', 'none');
+
+vis_month.append('svg:path')
+.attr('d', month_lineGen_Max(monthly_active_data)) //mapping d to data
+.attr('stroke', 'blue')
+.attr('stroke-width', 2)
+.attr('fill', 'none');
 </script>
+
+<style>
+.axis path {
+    fill: none;
+    stroke: #777;
+    shape-rendering: crispEdges;
+}
+.axis text {
+    font-family: Lato;
+    font-size: 13px;
+}
+</style>
