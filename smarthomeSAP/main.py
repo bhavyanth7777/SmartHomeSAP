@@ -38,7 +38,7 @@ connection = pyhdb.connect(host="52.74.212.84",port=30015, user="SYSTEM", passwo
 cursor = connection.cursor()
 
 from tornado.options import define, options, parse_command_line
-define('port',default=8000,type=int)
+define('port',default=9000,type=int)
 
 class IndexHandler(tornado.web.RequestHandler):
     def get(self):
@@ -358,7 +358,7 @@ if __name__ == "__main__":
     app = tornado.web.Application(handlers, template_path=os.path.join(os.path.dirname(__file__), "templates"),
                                   static_path=os.path.join(os.path.dirname(__file__), "static"),cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=", debug=True)
     http_server = tornado.httpserver.HTTPServer(app)
-    options.port = 8000
+    options.port = 9000
     http_server.listen(options.port)
     print("Live at %s"%options.port)
     loop = tornado.ioloop.IOLoop.instance()
