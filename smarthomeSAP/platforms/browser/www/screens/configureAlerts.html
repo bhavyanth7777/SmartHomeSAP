@@ -11,7 +11,7 @@
           <label for="max_heart_rate">Max Heart Rate</label>
         </div>
       </div>
-      <div class="row">
+      <!-- <div class="row">
         <div class="input-field col s12">
           <input id="washroom_trips" type="number" class="validate">
           <label for="washroom_trips">Max Washroom Trips</label>
@@ -33,8 +33,43 @@
           <input id="movement_alert_end" type="text" class="validate">
           <label for="movement_alert_between">Movement Alert Between</label>
         </div>
-      </div>
+      </div> -->
 
     </form>
-    <a class="waves-effect waves-light btn col s6 offset-s3" style="background-color:#FFC107"><i class="material-icons right">done</i>Submit</a>
+    <a class="waves-effect waves-light btn col s6 offset-s3" style="background-color:#FFC107" id="alert_submit"><i class="material-icons right">done</i>Submit</a>
+    <a class="waves-effect waves-light btn col s4 offset-s1" id="stop_alert" style="margin-top: 6%">Stop Alerts</a>
+    <a class="waves-effect waves-light btn col s4 offset-s2" id="start_alert" style="margin-top: 6%">Start Alerts</a>
   </div>
+
+  <script>
+
+  $('#alert_submit').click(function(){
+    var min_heart_rate = $('#min_heart_rate').val();
+    var max_heart_rate = $('#max_heart_rate').val();
+
+    wsCaregiver.send(JSON.stringify({
+      messageLabel:"thresholdHeartRate",
+      thresholdHeartRateMax:min_heart_rate,
+      thresholdHeartRateMin:max_heart_rate
+    }));
+    alert("thresholds set");
+
+    wsCaregiver.send(JSON.stringify({
+      messageLabel: "heartBeatAlerts"
+    }));
+  });
+
+  $('#stop_alert').click(function(){
+    wsCaregiver.send(JSON.stringify({
+      messageLabel: "FLAG_SET",
+      flag_value: "OFF"
+    }));
+  });
+
+  $('#start_alert').click(function(){
+    wsCaregiver.send(JSON.stringify({
+      messageLabel: "FLAG_SET",
+      flag_value: "ON"
+    }));
+  });
+  </script>

@@ -11,6 +11,20 @@
 <svg id="visualisation_week" style="display:none;" width="400" height="200"></svg>
 <svg id="visualisation_month" style="display:none;" width="400" height="200"></svg>
 
+<div class="preloader-wrapper small" id="spinnerSleep" style="left:45% !important">
+    <div class="spinner-layer spinner-green-only">
+        <div class="circle-clipper left">
+            <div class="circle"></div>
+        </div>
+        <div class="gap-patch">
+            <div class="circle"></div>
+        </div>
+        <div class="circle-clipper right">
+            <div class="circle"></div>
+        </div>
+    </div>
+</div>
+
 <div id="sleepTab">
 <div class="row marginBottom0">
     <div class="col s12 m6 marginBottomCol">
@@ -131,6 +145,7 @@
 
     if (messageLabel === "Sleep") {
       console.log("Sleep");
+      $('#spinnerSleep').removeClass("active");
        var lastActiveTimeStampConverted = messageFromServer.lastActiveTimeStampConverted;
        var minutes = messageFromServer.minutes;
        var seconds = messageFromServer.seconds;
@@ -149,6 +164,7 @@ var sleepInterval = setInterval(function() {
     wsSleep.send(JSON.stringify({
         messageLabel: "Sleep"
     }));
+    $('#spinnerSleep').addClass("active");
 }, 60000);
 
 $('#tab_active_dashboardSleep').click(function(){

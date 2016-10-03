@@ -28,8 +28,9 @@ client = TwilioRestClient(account_sid, auth_token)
 # defined constants
 count = 1560000001
 heartCount = 1570000001
-caregiver_count = 201
+caregiver_count = 1005
 lightCount = 1
+FLAG = {"status":"ON"}
 previousTime = datetime.datetime.now()
 thresholdHeartRate = {"thresholdHeartRateMax":100,"thresholdHeartRateMin":30}
 
@@ -190,19 +191,14 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
         elif messageLabel == "thresholdHeartRate":
             # get values of minimum and maximum heart rate from html
+            print("thresholdHeartRate")
             global thresholdHeartRate
             thresholdHeartRate['thresholdHeartRateMax'] = messageReceived['thresholdHeartRateMax']
             thresholdHeartRate['thresholdHeartRateMin'] = messageReceived['thresholdHeartRateMin']
+            print(thresholdHeartRate)
 
         elif messageLabel == "Pulse":
             print("In pulse")
-            try:
-                cursor.execute("SELECT TOP 1 SENSOR_STATUS,SENSOR_RECORD_CREATED FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART' ORDER BY SENSOR_RECORD_CREATED DESC")
-                heartData = cursor.fetchone()
-                latestHeartRate = int(heartData[0])
-                print("latestHeartRate",latestHeartRate)
-            except Exception as e:
-                print("1",e)
 
             try:
                 cursor.execute("SELECT AVG(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART'") #TODO: and date= today's date
@@ -224,10 +220,22 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             except Exception as e:
                 print("3",e)
 
-            self.write_message(json.dumps({"messageLabel":"Pulse","latestHeartRate":latestHeartRate,"averageHeartRate":averageHeartRate,"max_heart_rate":max_HeartRate,"min_heart_rate":min_HeartRate}))
+            self.write_message(json.dumps({"messageLabel":"Pulse","averageHeartRate":averageHeartRate,"max_heart_rate":max_HeartRate,"min_heart_rate":min_HeartRate}))
             # except Exception as e:
             #     print("In except Handler Pulse",e)
             #     self.write_message(json.dumps({"messageLabel":"Pulse","latestHeartRate":"N/A","averageHeartRate":"N/A","max_heart_rate":"N/A","min_heart_rate":"N/A"}))
+
+        elif messageLabel == "currentPulse":
+            try:
+                cursor.execute("SELECT TOP 1 SENSOR_STATUS,SENSOR_RECORD_CREATED FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART' ORDER BY SENSOR_RECORD_CREATED DESC")
+                heartData = cursor.fetchone()
+                latestHeartRate = int(heartData[0])
+                if latestHeartRate > 140:
+                    latestHeartRate = 139
+                print("latestHeartRate",latestHeartRate)
+                self.write_message(json.dumps({"messageLabel":"currentPulse","latestHeartRate":latestHeartRate}))
+            except Exception as e:
+                print("1",e)
 
         elif messageLabel == "heartGraphData":
             # {"heartValue":"72","timestamp":"timestampFromServer"}
@@ -244,50 +252,59 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
 
         elif messageLabel == "heartBeatAlerts":
+            print("heartBeatAlerts")
             thresholdHeartRateMin = thresholdHeartRate['thresholdHeartRateMin'] # get it from the dashboard
             thresholdHeartRateMax = thresholdHeartRate['thresholdHeartRateMax']
-
-            try:
-
-                cursor.execute("SELECT TOP 1 SENSOR_RECORD_CREATED FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART' ORDER BY SENSOR_RECORD_CREATED DESC")
-                heartData = cursor.fetchone()
-                datetimeNow = datetime.datetime.now()
-                latestHeartRateTimeStamp = heartData[0]
-                td = datetimeNow - latestHeartRateTimeStamp
-                tDelta = divmod(td.days * 86400 + td.seconds, 60)
-                tDelta = tDelta[0]
-
-                if tDelta > 5:
-                    message = client.messages.create(body="Heart Beat Sensor Might have failed! Please check the sensor",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
-                    print(message.sid)
-                else:
-                    pass
-            except Exception as e:
-                print("In except handler heartBeatAlerts-1",e)
+            print(thresholdHeartRate)
+            # message = client.messages.create(body="Heart Beat Spike! Please check the patient",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
+            # print(message.sid)
 
             try:
                 cursor.execute("SELECT TOP 1 CAREGIVER_MOBILE FROM SAP_STARTUP_SMARTHOME.SMARTHOME_CAREGIVER_INFO ORDER BY CAREGIVER_ID DESC")
                 caregiverPhoneNumber = cursor.fetchone()[0]
-
-                if latestHeartRate > thresholdHeartRateMax:
-                    # send a twillo message
-                    message = client.messages.create(body="Heart Beat Spike! Please check the patient",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
-                    print(message.sid)
-                elif latestHeartRate < thresholdHeartRateMin:
-                    message = client.messages.create(body="Heart Beat Low! Please check the patient",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
-                    print(message.sid)
+                print(caregiverPhoneNumber)
             except Exception as e:
                 print("In except handler heartBeatAlerts-2",e)
+
+            try:
+                cursor.execute("SELECT TOP 1 SENSOR_RECORD_CREATED,SENSOR_STATUS FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART' ORDER BY SENSOR_RECORD_CREATED DESC")
+                heartData = cursor.fetchone()
+                datetimeNow = datetime.datetime.now()
+                latestHeartRateTimeStamp = heartData[0]
+                latestHeartRate = heartData[1]
+                print("latestHeartRate",latestHeartRate)
+                td = datetimeNow - latestHeartRateTimeStamp
+                tDelta = divmod(td.days * 86400 + td.seconds, 60)
+                tDelta = tDelta[0]
+
+                if tDelta > 10 and FLAG['status'] == "ON": #TODO: add variable
+                    print(FLAG)
+                    # message = client.messages.create(body="Heart Beat Sensor Might have failed! Please check the sensor",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
+                    # print(message.sid)
+                else:
+                    pass
+
+                if (int(latestHeartRate) > thresholdHeartRateMax) and FLAG['status'] == "ON":
+                    # message = client.messages.create(body="Heart Beat Spike! Please check the patient",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
+                    # print(message.sid)
+                    print("spike")
+                elif (int(latestHeartRate) < thresholdHeartRateMin) and FLAG['status'] == "ON":
+                    # message = client.messages.create(body="Heart Beat Low! Please check the patient",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
+                    # print(message.sid)
+                    print("dip")
+            except Exception as e:
+                print("In except handler heartBeatAlerts-1",e)
 
 
 
         elif messageLabel == "caregiver_details":
-            caregiver_name = messageReceived['caregiver_name']
-            caregiver_phone = messageReceived['caregiver_phone']
+            print("caregiver_details")
+            caregiver_name_value = messageReceived['caregiver_name']
+            caregiver_phone = str(messageReceived['caregiver_phone'])
             caregiver_relation = messageReceived['caregiver_relation']
             global caregiver_count
-            caregiver_count = caregiver_count+1
-            cursor.execute("INSERT INTO SAP_STARTUP_SMARTHOME.SMARTHOME_CAREGIVER_INFO VALUES(%s,%s,%s,%s,1,CURRENT_TIMESTAMP,1)"%(caregiver_count,caregiver_name,caregiver_phone,caregiver_relation))
+            caregiver_count = str(caregiver_count+1)
+            cursor.execute("INSERT INTO SAP_STARTUP_SMARTHOME.SMARTHOME_CAREGIVER_INFO VALUES("+caregiver_count+",'"+caregiver_name_value+"','"+caregiver_phone+"','"+caregiver_relation+"',1,CURRENT_TIMESTAMP,1)")
             connection.commit()
 
         elif messageLabel == "currentDatetime":
@@ -304,6 +321,14 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             #TODO: from 9pm to 8 am, total sleep - (Awakened Times * 10 minutes + Time taken to sleep)
             #TODO: from 9pm to 8 am, number of times the sensor_id of bathroom has detected motion
             pass
+
+        elif messageLabel == "FLAG_SET":
+            flag_value = messageReceived['flag_value']
+            if flag_value == "ON":
+                FLAG['status'] = "ON"
+            elif flag_value == "OFF":
+                FLAG['status'] = "OFF"
+            print(FLAG)
 
 
 

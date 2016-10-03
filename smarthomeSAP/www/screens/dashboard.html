@@ -11,53 +11,69 @@
 <svg id="visualisation_week" style="display:none;" width="400" height="200"></svg>
 <svg id="visualisation_month" style="display:none;" width="400" height="200"></svg>
 
+<div class="preloader-wrapper small" id="spinner" style="left:45% !important">
+    <div class="spinner-layer spinner-green-only">
+        <div class="circle-clipper left">
+            <div class="circle"></div>
+        </div>
+        <div class="gap-patch">
+            <div class="circle"></div>
+        </div>
+        <div class="circle-clipper right">
+            <div class="circle"></div>
+        </div>
+    </div>
+</div>
+
+
 <div id="activeTab">
-<div class="row marginBottom0">
-    <div class="col s12 m6 marginBottomCol">
-        <div class="card">
-            <div class="card-content row">
-                <p class="card-title col s8">Active Time</p><span class="card-title col s4" style="color:green" id="active_time">NA</span>
+    <div class="row marginBottom0">
+        <div class="col s12 m6 marginBottomCol">
+            <div class="card">
+                <div class="card-content row">
+                    <p class="card-title col s8">Active Time</p><span class="card-title col s4" style="color:green" id="active_time">NA</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="row marginBottom0">
-    <div class="col s12 m6 marginBottomCol">
-        <div class="card">
-            <div class="card-content row">
-                <p class="card-title col s8">Steps</p><span class="card-title col s4" style="color:green" id="active_steps">NA</span>
+    <div class="row marginBottom0">
+        <div class="col s12 m6 marginBottomCol">
+            <div class="card">
+                <div class="card-content row">
+                    <p class="card-title col s8">Steps</p><span class="card-title col s4" style="color:green" id="active_steps">NA</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="row marginBottom0">
-    <div class="col s12 m6 marginBottomCol">
-        <div class="card">
-            <div class="card-content row">
-                <p class="card-title col s8">Last Active</p><span class="card-title col s4" style="color:green" id="last_active">NA</span>
+    <div class="row marginBottom0">
+        <div class="col s12 m6 marginBottomCol">
+            <div class="card">
+                <div class="card-content row">
+                    <p class="card-title col s8">Last Active</p><span class="card-title col s4" style="color:green" id="last_active">NA</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="row marginBottom0">
-    <div class="col s12 m6 marginBottomCol">
-        <div class="card">
-            <div class="card-content row">
-                <p class="card-title col s8">Last Location</p><span class="card-title col s4" style="color:green" id="last_active_location">Washroom</span>
+    <div class="row marginBottom0">
+        <div class="col s12 m6 marginBottomCol">
+            <div class="card">
+                <div class="card-content row">
+                    <p class="card-title col s8">Last Location</p><span class="card-title col s4" style="color:green" id="last_active_location">Washroom</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 <div class="fixed-action-btn horizontal" style="bottom: 45px; right: 24px;">
     <a class="btn-floating btn-large" id="active_chart" style="background-color:#FFC107">
-      <i class="material-icons">insert_chart</i>
+        <i class="material-icons">insert_chart</i>
     </a>
     <ul>
-      <li><a class="btn-floating red" id="active_monthly"><i class="material-icons">date_range</i></a></li>
-      <li><a class="btn-floating red" id="active_weekly"><i class="material-icons">view_week</i></a></li>
+        <li><a class="btn-floating red" id="active_monthly"><i class="material-icons">date_range</i></a></li>
+        <li><a class="btn-floating red" id="active_weekly"><i class="material-icons">view_week</i></a></li>
     </ul>
-  </div>
+</div>
+
 
 
 <script>
@@ -65,26 +81,26 @@
         $('ul.tabs').tabs();
     });
 
-    $('#active_chart').click(function(){
-      $('#activeTab').css("display","block");
-      $('#visualisation_day').css("display","none");
-      $('#visualisation_week').css("display","none");
-      $('#visualisation_month').css("display","none");
+    $('#active_chart').click(function() {
+        $('#activeTab').css("display", "block");
+        $('#visualisation_day').css("display", "none");
+        $('#visualisation_week').css("display", "none");
+        $('#visualisation_month').css("display", "none");
     });
 
-    $('#active_weekly').click(function(){
-      $('#activeTab').css("display","none");
-      $('#visualisation_day').css("display","block");
-      $('#visualisation_week').css("display","block");
-      $('#visualisation_month').css("display","block");
+    $('#active_weekly').click(function() {
+        $('#activeTab').css("display", "none");
+        $('#visualisation_day').css("display", "block");
+        $('#visualisation_week').css("display", "block");
+        $('#visualisation_month').css("display", "block");
 
     });
 
-    $('#active_monthly').click(function(){
-      $('#activeTab').css("display","none");
-      $('#visualisation_day').css("display","block");
-      $('#visualisation_week').css("display","block");
-      $('#visualisation_month').css("display","block");
+    $('#active_monthly').click(function() {
+        $('#activeTab').css("display", "none");
+        $('#visualisation_day').css("display", "block");
+        $('#visualisation_week').css("display", "block");
+        $('#visualisation_month').css("display", "block");
     });
 
     // WEBSOCKET CODE
@@ -98,229 +114,231 @@
 
 
     wsActive.onclose = function() {
-    alert("Connection Closed");
+        alert("Connection Closed");
     }
 
     wsActive.onmessage = function(messageFromServer) {
-    messageFromServer = JSON.parse(messageFromServer.data);
-    messageLabel = messageFromServer.messageLabel;
+        messageFromServer = JSON.parse(messageFromServer.data);
+        messageLabel = messageFromServer.messageLabel;
 
-    if (messageLabel === "Active") {
-      console.log("Active");
-       var lastActiveTimeStampConverted = messageFromServer.lastActiveTimeStampConverted;
-       var minutes = messageFromServer.minutes;
-       var seconds = messageFromServer.seconds;
-       var steps = minutes * 15;
-       $('#last_active').html(lastActiveTimeStampConverted);
-       $('#active_steps').html(steps);
-       $('#active_time').html(minutes+"m"+seconds+"s");
-   }
-  }
+        if (messageLabel === "Active") {
+            console.log("Active");
+            $('#spinner').removeClass("active");
+            var lastActiveTimeStampConverted = messageFromServer.lastActiveTimeStampConverted;
+            var minutes = messageFromServer.minutes;
+            var seconds = messageFromServer.seconds;
+            var steps = minutes * 15;
+            $('#last_active').html(lastActiveTimeStampConverted);
+            $('#active_steps').html(steps);
+            $('#active_time').html(minutes + "m" + seconds + "s");
+        }
+    }
 
 
-var active_interval = setInterval(function() {
-  console.log("sending active");
-    wsActive.send(JSON.stringify({
-        messageLabel: "Active"
-    }));
-}, 3000);
+    var active_interval = setInterval(function() {
+        console.log("sending active");
+        wsActive.send(JSON.stringify({
+            messageLabel: "Active"
+        }));
+        $('#spinner').addClass("active");
+    }, 10000);
 
-// CLEAR INTERVAL IF PULSE OR SLEEP IS CLICKED
-$('#tab_pulse_dashboard').click(function(){
-  clearInterval(active_interval);
-});
+    // CLEAR INTERVAL IF PULSE OR SLEEP IS CLICKED
+    $('#tab_pulse_dashboard').click(function() {
+        clearInterval(active_interval);
+    });
 
-$('#tab_sleep_dashboard').click(function(){
-  clearInterval(active_interval);
-});
+    $('#tab_sleep_dashboard').click(function() {
+        clearInterval(active_interval);
+    });
 
 
     // GRAPHING SCRIPTS
     var daily_active_data = [{
-      "spikes":"3",
-      "time": "8"
-    },{
-      "spikes":"4",
-      "time": "9"
-    },{
-      "spikes":"2",
-      "time": "10"
-    },{
-      "spikes":"1",
-      "time": "11"
-    },{
-      "spikes":"0",
-      "time": "12"
-    },{
-      "spikes":"5",
-      "time": "13"
-    },{
-      "spikes":"4",
-      "time": "14"
-    },{
-      "spikes":"4",
-      "time": "15"
-    },{
-      "spikes":"0",
-      "time": "16"
-    },{
-      "spikes":"0",
-      "time": "17"
-    },{
-      "spikes":"1",
-      "time": "18"
-    },{
-      "spikes":"2",
-      "time": "19"
-    },{
-      "spikes":"0",
-      "time": "20"
-    },{
-      "spikes":"1",
-      "time": "21"
-    },{
-      "spikes":"2",
-      "time": "22"
-    },{
-      "spikes":"0",
-      "time": "23"
-    },{
-      "spikes":"0",
-      "time": "0"
-    },{
-      "spikes":"0",
-      "time": "1"
-    },{
-      "spikes":"0",
-      "time": "2"
-    },{
-      "spikes":"0",
-      "time": "3"
-    },{
-      "spikes":"2",
-      "time": "4"
-    },{
-      "spikes":"2",
-      "time": "5"
-    },{
-      "spikes":"0",
-      "time": "6"
-    },{
-      "spikes":"4",
-      "time": "7"
+        "spikes": "3",
+        "time": "8"
+    }, {
+        "spikes": "4",
+        "time": "9"
+    }, {
+        "spikes": "2",
+        "time": "10"
+    }, {
+        "spikes": "1",
+        "time": "11"
+    }, {
+        "spikes": "0",
+        "time": "12"
+    }, {
+        "spikes": "5",
+        "time": "13"
+    }, {
+        "spikes": "4",
+        "time": "14"
+    }, {
+        "spikes": "4",
+        "time": "15"
+    }, {
+        "spikes": "0",
+        "time": "16"
+    }, {
+        "spikes": "0",
+        "time": "17"
+    }, {
+        "spikes": "1",
+        "time": "18"
+    }, {
+        "spikes": "2",
+        "time": "19"
+    }, {
+        "spikes": "0",
+        "time": "20"
+    }, {
+        "spikes": "1",
+        "time": "21"
+    }, {
+        "spikes": "2",
+        "time": "22"
+    }, {
+        "spikes": "0",
+        "time": "23"
+    }, {
+        "spikes": "0",
+        "time": "0"
+    }, {
+        "spikes": "0",
+        "time": "1"
+    }, {
+        "spikes": "0",
+        "time": "2"
+    }, {
+        "spikes": "0",
+        "time": "3"
+    }, {
+        "spikes": "2",
+        "time": "4"
+    }, {
+        "spikes": "2",
+        "time": "5"
+    }, {
+        "spikes": "0",
+        "time": "6"
+    }, {
+        "spikes": "4",
+        "time": "7"
     }];
 
     var weekly_active_data = [{
-        "active_hours":"2",
-        "day":"1"
-    },{
-        "active_hours":"3",
-        "day":"2"
-    },{
-        "active_hours":"3",
-        "day":"3"
-    },{
-        "active_hours":"2",
-        "day":"4"
-    },{
-        "active_hours":"1",
-        "day":"5"
-    },{
-        "active_hours":"3",
-        "day":"6"
-    },{
-        "active_hours":"3",
-        "day":"7"
-    },];
+        "active_hours": "2",
+        "day": "1"
+    }, {
+        "active_hours": "3",
+        "day": "2"
+    }, {
+        "active_hours": "3",
+        "day": "3"
+    }, {
+        "active_hours": "2",
+        "day": "4"
+    }, {
+        "active_hours": "1",
+        "day": "5"
+    }, {
+        "active_hours": "3",
+        "day": "6"
+    }, {
+        "active_hours": "3",
+        "day": "7"
+    }, ];
 
     var monthly_active_data = [{
-        "active_hours":"2",
-        "day":"1"
-    },{
-        "active_hours":"3",
-        "day":"2"
-    },{
-        "active_hours":"3",
-        "day":"3"
-    },{
-        "active_hours":"2",
-        "day":"4"
-    },{
-        "active_hours":"1",
-        "day":"5"
-    },{
-        "active_hours":"3",
-        "day":"6"
-    },{
-        "active_hours":"3",
-        "day":"7"
-    },{
-        "active_hours":"2",
-        "day":"8"
-    },{
-        "active_hours":"3",
-        "day":"9"
-    },{
-        "active_hours":"3",
-        "day":"10"
-    },{
-        "active_hours":"2",
-        "day":"11"
-    },{
-        "active_hours":"1",
-        "day":"12"
-    },{
-        "active_hours":"3",
-        "day":"13"
-    },{
-        "active_hours":"3",
-        "day":"14"
-    },{
-        "active_hours":"2",
-        "day":"15"
-    },{
-        "active_hours":"3",
-        "day":"16"
-    },{
-        "active_hours":"3",
-        "day":"19"
-    },{
-        "active_hours":"2",
-        "day":"20"
-    },{
-        "active_hours":"1",
-        "day":"21"
-    },{
-        "active_hours":"3",
-        "day":"22"
-    },{
-        "active_hours":"3",
-        "day":"23"
-    },{
-        "active_hours":"2",
-        "day":"24"
-    },{
-        "active_hours":"3",
-        "day":"25"
-    },{
-        "active_hours":"3",
-        "day":"26"
-    },{
-        "active_hours":"2",
-        "day":"27"
-    },{
-        "active_hours":"1",
-        "day":"28"
-    },{
-        "active_hours":"3",
-        "day":"29"
-    },{
-        "active_hours":"3",
-        "day":"30"
-    },];
+        "active_hours": "2",
+        "day": "1"
+    }, {
+        "active_hours": "3",
+        "day": "2"
+    }, {
+        "active_hours": "3",
+        "day": "3"
+    }, {
+        "active_hours": "2",
+        "day": "4"
+    }, {
+        "active_hours": "1",
+        "day": "5"
+    }, {
+        "active_hours": "3",
+        "day": "6"
+    }, {
+        "active_hours": "3",
+        "day": "7"
+    }, {
+        "active_hours": "2",
+        "day": "8"
+    }, {
+        "active_hours": "3",
+        "day": "9"
+    }, {
+        "active_hours": "3",
+        "day": "10"
+    }, {
+        "active_hours": "2",
+        "day": "11"
+    }, {
+        "active_hours": "1",
+        "day": "12"
+    }, {
+        "active_hours": "3",
+        "day": "13"
+    }, {
+        "active_hours": "3",
+        "day": "14"
+    }, {
+        "active_hours": "2",
+        "day": "15"
+    }, {
+        "active_hours": "3",
+        "day": "16"
+    }, {
+        "active_hours": "3",
+        "day": "19"
+    }, {
+        "active_hours": "2",
+        "day": "20"
+    }, {
+        "active_hours": "1",
+        "day": "21"
+    }, {
+        "active_hours": "3",
+        "day": "22"
+    }, {
+        "active_hours": "3",
+        "day": "23"
+    }, {
+        "active_hours": "2",
+        "day": "24"
+    }, {
+        "active_hours": "3",
+        "day": "25"
+    }, {
+        "active_hours": "3",
+        "day": "26"
+    }, {
+        "active_hours": "2",
+        "day": "27"
+    }, {
+        "active_hours": "1",
+        "day": "28"
+    }, {
+        "active_hours": "3",
+        "day": "29"
+    }, {
+        "active_hours": "3",
+        "day": "30"
+    }, ];
 
 
-  // DEFINE GRAPH DIMENSIONS
+    // DEFINE GRAPH DIMENSIONS
     var vis_day = d3.select("#visualisation_day"),
         WIDTH = 400,
         HEIGHT = 200,
@@ -330,10 +348,10 @@ $('#tab_sleep_dashboard').click(function(){
             bottom: 20,
             left: 50
         },
-    // DEFINE X SCALE AND Y SCALE DYNAMICALLY
-        day_xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([0,23]),
-        day_yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0,10]),
-    // DEFINE X AXIS AND Y AXIS
+        // DEFINE X SCALE AND Y SCALE DYNAMICALLY
+        day_xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([0, 23]),
+        day_yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0, 10]),
+        // DEFINE X AXIS AND Y AXIS
         day_xAxis = d3.svg.axis()
         .scale(day_xScale),
 
@@ -343,146 +361,146 @@ $('#tab_sleep_dashboard').click(function(){
 
     // REFLECT X AXIS
     vis_day.append("svg:g")
-        .attr("class","axis")
+        .attr("class", "axis")
         .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
         .call(day_xAxis);
 
     // REFLECT Y AXIS
     vis_day.append("svg:g")
-    .attr("class","axis")
-    .attr("transform", "translate(" + (MARGINS.left) + ",0)")
-    .call(day_yAxis);
+        .attr("class", "axis")
+        .attr("transform", "translate(" + (MARGINS.left) + ",0)")
+        .call(day_yAxis);
 
     // DEFINE THE LINE
     var day_lineGen = d3.svg.line()
-  .x(function(d) {
-    return day_xScale(d.time);
-  })
-  .y(function(d) {
-    return day_yScale(d.spikes);
-  })
-  .interpolate("basis"); // to smooth out the lines
+        .x(function(d) {
+            return day_xScale(d.time);
+        })
+        .y(function(d) {
+            return day_yScale(d.spikes);
+        })
+        .interpolate("basis"); // to smooth out the lines
 
-  // ADD THE LINE TO SVG
-  vis_day.append('svg:path')
-  .attr('d', day_lineGen(daily_active_data)) //mapping d to data
-  .attr('stroke', 'green')
-  .attr('stroke-width', 2)
-  .attr('fill', 'none');
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ADD THE LINE TO SVG
+    vis_day.append('svg:path')
+        .attr('d', day_lineGen(daily_active_data)) //mapping d to data
+        .attr('stroke', 'green')
+        .attr('stroke-width', 2)
+        .attr('fill', 'none');
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-// DEFINE GRAPH DIMENSIONS
-  var vis_week = d3.select("#visualisation_week"),
-      WIDTH = 400,
-      HEIGHT = 200,
-      MARGINS = {
-          top: 20,
-          right: 20,
-          bottom: 20,
-          left: 50
-      },
-  // DEFINE X SCALE AND Y SCALE DYNAMICALLY
-      week_xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([0,7]),
-      week_yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0,10]),
-  // DEFINE X AXIS AND Y AXIS
-      week_xAxis = d3.svg.axis()
-      .scale(week_xScale),
+    // DEFINE GRAPH DIMENSIONS
+    var vis_week = d3.select("#visualisation_week"),
+        WIDTH = 400,
+        HEIGHT = 200,
+        MARGINS = {
+            top: 20,
+            right: 20,
+            bottom: 20,
+            left: 50
+        },
+        // DEFINE X SCALE AND Y SCALE DYNAMICALLY
+        week_xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([0, 7]),
+        week_yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0, 10]),
+        // DEFINE X AXIS AND Y AXIS
+        week_xAxis = d3.svg.axis()
+        .scale(week_xScale),
 
-      week_yAxis = d3.svg.axis()
-      .scale(week_yScale)
-      .orient("left");
+        week_yAxis = d3.svg.axis()
+        .scale(week_yScale)
+        .orient("left");
 
-  // REFLECT X AXIS
-  vis_week.append("svg:g")
-      .attr("class","axis")
-      .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
-      .call(week_xAxis);
+    // REFLECT X AXIS
+    vis_week.append("svg:g")
+        .attr("class", "axis")
+        .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+        .call(week_xAxis);
 
-  // REFLECT Y AXIS
-  vis_week.append("svg:g")
-  .attr("class","axis")
-  .attr("transform", "translate(" + (MARGINS.left) + ",0)")
-  .call(week_yAxis);
+    // REFLECT Y AXIS
+    vis_week.append("svg:g")
+        .attr("class", "axis")
+        .attr("transform", "translate(" + (MARGINS.left) + ",0)")
+        .call(week_yAxis);
 
-  // DEFINE THE LINE
-  var week_lineGen = d3.svg.line()
-.x(function(d) {
-  return week_xScale(d.day);
-})
-.y(function(d) {
-  return week_yScale(d.active_hours);
-})
-.interpolate("basis"); // to smooth out the lines
+    // DEFINE THE LINE
+    var week_lineGen = d3.svg.line()
+        .x(function(d) {
+            return week_xScale(d.day);
+        })
+        .y(function(d) {
+            return week_yScale(d.active_hours);
+        })
+        .interpolate("basis"); // to smooth out the lines
 
-// ADD THE LINE TO SVG
-vis_week.append('svg:path')
-.attr('d', week_lineGen(weekly_active_data)) //mapping d to data
-.attr('stroke', 'green')
-.attr('stroke-width', 2)
-.attr('fill', 'none');
+    // ADD THE LINE TO SVG
+    vis_week.append('svg:path')
+        .attr('d', week_lineGen(weekly_active_data)) //mapping d to data
+        .attr('stroke', 'green')
+        .attr('stroke-width', 2)
+        .attr('fill', 'none');
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var vis_month = d3.select("#visualisation_month"),
-    WIDTH = 400,
-    HEIGHT = 200,
-    MARGINS = {
-        top: 20,
-        right: 20,
-        bottom: 20,
-        left: 50
-    },
-// DEFINE X SCALE AND Y SCALE DYNAMICALLY
-    month_xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([0,30]),
-    month_yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0,12]),
-// DEFINE X AXIS AND Y AXIS
-    month_xAxis = d3.svg.axis()
-    .scale(month_xScale),
+    var vis_month = d3.select("#visualisation_month"),
+        WIDTH = 400,
+        HEIGHT = 200,
+        MARGINS = {
+            top: 20,
+            right: 20,
+            bottom: 20,
+            left: 50
+        },
+        // DEFINE X SCALE AND Y SCALE DYNAMICALLY
+        month_xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([0, 30]),
+        month_yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([0, 12]),
+        // DEFINE X AXIS AND Y AXIS
+        month_xAxis = d3.svg.axis()
+        .scale(month_xScale),
 
-    month_yAxis = d3.svg.axis()
-    .scale(month_yScale)
-    .orient("left");
+        month_yAxis = d3.svg.axis()
+        .scale(month_yScale)
+        .orient("left");
 
-// REFLECT X AXIS
-vis_month.append("svg:g")
-    .attr("class","axis")
-    .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
-    .call(month_xAxis);
+    // REFLECT X AXIS
+    vis_month.append("svg:g")
+        .attr("class", "axis")
+        .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+        .call(month_xAxis);
 
-// REFLECT Y AXIS
-vis_month.append("svg:g")
-.attr("class","axis")
-.attr("transform", "translate(" + (MARGINS.left) + ",0)")
-.call(month_yAxis);
+    // REFLECT Y AXIS
+    vis_month.append("svg:g")
+        .attr("class", "axis")
+        .attr("transform", "translate(" + (MARGINS.left) + ",0)")
+        .call(month_yAxis);
 
-// DEFINE THE LINE
-var month_lineGen = d3.svg.line()
-.x(function(d) {
-return month_xScale(d.day);
-})
-.y(function(d) {
-return month_yScale(d.active_hours);
-})
-.interpolate("basis"); // to smooth out the lines
+    // DEFINE THE LINE
+    var month_lineGen = d3.svg.line()
+        .x(function(d) {
+            return month_xScale(d.day);
+        })
+        .y(function(d) {
+            return month_yScale(d.active_hours);
+        })
+        .interpolate("basis"); // to smooth out the lines
 
-// ADD THE LINE TO SVG
-vis_month.append('svg:path')
-.attr('d', month_lineGen(monthly_active_data)) //mapping d to data
-.attr('stroke', 'green')
-.attr('stroke-width', 2)
-.attr('fill', 'none');
-
+    // ADD THE LINE TO SVG
+    vis_month.append('svg:path')
+        .attr('d', month_lineGen(monthly_active_data)) //mapping d to data
+        .attr('stroke', 'green')
+        .attr('stroke-width', 2)
+        .attr('fill', 'none');
 </script>
 
 <style>
-.axis path {
-    fill: none;
-    stroke: #777;
-    shape-rendering: crispEdges;
-}
-.axis text {
-    font-family: Lato;
-    font-size: 13px;
-}
+    .axis path {
+        fill: none;
+        stroke: #777;
+        shape-rendering: crispEdges;
+    }
+
+    .axis text {
+        font-family: Lato;
+        font-size: 13px;
+    }
 </style>

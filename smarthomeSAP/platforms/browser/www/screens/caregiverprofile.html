@@ -2,24 +2,14 @@
 <div class="row">
     <form class="col s12">
       <div class="row">
-        <div class="input-field col s6">
+        <div class="input-field col s12">
           <input id="first_name" type="text" class="validate">
           <label for="first_name">First Name</label>
         </div>
-        <div class="input-field col s6">
-          <input id="last_name" type="text" class="validate">
-          <label for="last_name">Last Name</label>
-        </div>
       </div>
       <div class="row">
         <div class="input-field col s12">
-          <input id="email" type="email" class="validate">
-          <label for="email">Email</label>
-        </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s12">
-          <input id="phone" type="tel" class="validate">
+          <input id="phone" type="text" class="validate">
           <label for="phone">Phone</label>
         </div>
       </div>
@@ -30,5 +20,20 @@
         </div>
       </div>
     </form>
-    <a class="waves-effect waves-light btn col s6 offset-s3" style="background-color:#FFC107"><i class="material-icons right">done</i>Submit</a>
+    <a id="caregiver_submit" class="waves-effect waves-light btn col s6 offset-s3" style="background-color:#FFC107"><i class="material-icons right">done</i>Submit</a>
   </div>
+
+  <script>
+$('#caregiver_submit').click(function(){
+  var first_name = $('#first_name').val();
+  var phone = $('#phone').val();
+  var relationship = $('#relationship').val();
+  wsCaregiver.send(JSON.stringify({
+    messageLabel:"caregiver_details",
+    caregiver_name:first_name,
+    caregiver_phone:phone,
+    caregiver_relation:relationship
+  }));
+  alert("Profile Saved");
+});
+  </script>
