@@ -7,8 +7,11 @@
         </ul>
     </div>
 </div>
+<p style="text-align:center;display:none;" class="text_heading">Daily</p>
 <svg id="visualisation_day" style="display:none;" width="400" height="200"></svg>
+<p style="text-align:center;display:none;" class="text_heading">Weekly</p>
 <svg id="visualisation_week" style="display:none;" width="400" height="200"></svg>
+<p style="text-align:center;display:none;" class="text_heading">Monthly</p>
 <svg id="visualisation_month" style="display:none;" width="400" height="200"></svg>
 
 <div class="preloader-wrapper small" id="spinner" style="left:45% !important">
@@ -86,6 +89,7 @@
         $('#visualisation_day').css("display", "none");
         $('#visualisation_week').css("display", "none");
         $('#visualisation_month').css("display", "none");
+        $('.text_heading').css('display','none');
     });
 
     $('#active_weekly').click(function() {
@@ -93,6 +97,7 @@
         $('#visualisation_day').css("display", "block");
         $('#visualisation_week').css("display", "block");
         $('#visualisation_month').css("display", "block");
+        $('.text_heading').css('display','block');
 
     });
 
@@ -101,6 +106,7 @@
         $('#visualisation_day').css("display", "block");
         $('#visualisation_week').css("display", "block");
         $('#visualisation_month').css("display", "block");
+        $('.text_heading').css('display','block');
     });
 
     // WEBSOCKET CODE
