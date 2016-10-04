@@ -287,11 +287,11 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 else:
                     pass
 
-                if (int(latestHeartRate) > thresholdHeartRateMax) and FLAG['status'] == "ON":
+                if (int(latestHeartRate) > int(thresholdHeartRateMax)) and FLAG['status'] == "ON":
                     # message = client.messages.create(body="Heart Beat Spike! Please check the patient",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
                     # print(message.sid)
                     print("spike")
-                elif (int(latestHeartRate) < thresholdHeartRateMin) and FLAG['status'] == "ON":
+                elif (int(latestHeartRate) < int(thresholdHeartRateMin)) and FLAG['status'] == "ON":
                     # message = client.messages.create(body="Heart Beat Low! Please check the patient",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
                     # print(message.sid)
                     print("dip")
