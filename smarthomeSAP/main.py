@@ -201,7 +201,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             print("In pulse")
 
             try:
-                cursor.execute("SELECT AVG(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART'") #TODO: and date= today's date
+                # cursor.execute("SELECT AVG(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART'")
+                cursor.execute("SELECT AVG(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART' AND SENSOR_RECORD_CREATED > ADD_DAYS (TO_DATE (CURRENT_DATE, 'YYYY-MM-DD'), -1)")
                 averageHeartRate = cursor.fetchone()[0]
                 averageHeartRate = round(float(averageHeartRate))
                 print("averageHeartRate",averageHeartRate)
@@ -209,12 +210,14 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 print("2",e)
 
             try:
-                cursor.execute("SELECT MAX(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART'") #TODO: and date = today's date
+                # cursor.execute("SELECT MAX(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART'")
+                cursor.execute("SELECT MAX(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART' AND SENSOR_RECORD_CREATED > ADD_DAYS (TO_DATE (CURRENT_DATE, 'YYYY-MM-DD'), -1)")
                 max_HeartRate = cursor.fetchone()[0]
                 if max_HeartRate > 140:
                     max_HeartRate = 139
 
-                cursor.execute("SELECT MIN(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART'") #TODO: and date = today's date
+                # cursor.execute("SELECT MIN(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART'")
+                cursor.execute("SELECT MIN(TO_INT(SENSOR_STATUS)) FROM SAP_STARTUP_SMARTHOME.SMARTHOME_USER_SENSOR_DATA WHERE SENSOR_TYPE='HEART' AND SENSOR_RECORD_CREATED > ADD_DAYS (TO_DATE (CURRENT_DATE, 'YYYY-MM-DD'), -1)")
                 min_HeartRate = cursor.fetchone()[0]
                 print("min_HeartRate",min_HeartRate)
             except Exception as e:
