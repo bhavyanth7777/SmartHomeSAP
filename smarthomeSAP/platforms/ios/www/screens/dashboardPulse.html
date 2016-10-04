@@ -124,6 +124,7 @@
     var smoothie = new SmoothieChart();
     smoothie.streamTo(document.getElementById("visualisation_day"), 1000);
     var line1 = new TimeSeries();
+    counterVar = 0;
 
 
 
@@ -156,14 +157,16 @@
 
 
         }
+
         else if (messageLabel === "currentPulse") {
             $('#spinnerPulse').removeClass("active");
             var latest_heart_rate = messageFromServer.latestHeartRate;
             $('#latest_heart_rate').html(latest_heart_rate + " BPM");
 
             setInterval(function() {
-                line1.append(new Date().getTime(),latest_heart_rate);
-
+              var heart_rate_to_show = counterVar%2===0 ?latest_heart_rate:0;
+                line1.append(new Date().getTime(),heart_rate_to_show);
+                counterVar+=1;
             }, 1000);
 
             smoothie.addTimeSeries(line1);

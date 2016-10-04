@@ -30,7 +30,7 @@ count = 1560000001
 heartCount = 1570000001
 caregiver_count = 1005
 lightCount = 1
-FLAG = {"status":"ON"}
+FLAG = {"status":"OFF"}
 previousTime = datetime.datetime.now()
 thresholdHeartRate = {"thresholdHeartRateMax":100,"thresholdHeartRateMin":30}
 
@@ -259,8 +259,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
             thresholdHeartRateMin = thresholdHeartRate['thresholdHeartRateMin'] # get it from the dashboard
             thresholdHeartRateMax = thresholdHeartRate['thresholdHeartRateMax']
             print(thresholdHeartRate)
-            # message = client.messages.create(body="Heart Beat Spike! Please check the patient",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
-            # print(message.sid)
 
             try:
                 cursor.execute("SELECT TOP 1 CAREGIVER_MOBILE FROM SAP_STARTUP_SMARTHOME.SMARTHOME_CAREGIVER_INFO ORDER BY CAREGIVER_ID DESC")
@@ -280,20 +278,20 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 tDelta = divmod(td.days * 86400 + td.seconds, 60)
                 tDelta = tDelta[0]
 
-                if tDelta > 10 and FLAG['status'] == "ON": #TODO: add variable
-                    print(FLAG)
-                    # message = client.messages.create(body="Heart Beat Sensor Might have failed! Please check the sensor",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
-                    # print(message.sid)
+                if tDelta > 10 and FLAG['status'] == "ON":
+                    print("Sensor not working please check")
+                    message = client.messages.create(body="Heart Beat Sensor Might have failed! Please check the sensor",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
+                    print(message.sid)
                 else:
                     pass
 
                 if (int(latestHeartRate) > int(thresholdHeartRateMax)) and FLAG['status'] == "ON":
-                    # message = client.messages.create(body="Heart Beat Spike! Please check the patient",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
-                    # print(message.sid)
+                    message = client.messages.create(body="Heart Beat Spike! Please check the patient",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
+                    print(message.sid)
                     print("spike")
                 elif (int(latestHeartRate) < int(thresholdHeartRateMin)) and FLAG['status'] == "ON":
-                    # message = client.messages.create(body="Heart Beat Low! Please check the patient",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
-                    # print(message.sid)
+                    message = client.messages.create(body="Heart Beat Low! Please check the patient",to="+91%s"%caregiverPhoneNumber,from_="+1855-851-3299") # Replace with your Twilio number
+                    print(message.sid)
                     print("dip")
             except Exception as e:
                 print("In except handler heartBeatAlerts-1",e)
